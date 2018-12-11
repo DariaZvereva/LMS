@@ -1,23 +1,21 @@
 from flask import Flask
-from config import Config
+from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-from Domain.Users import User
-from Domain.Courses import Course
-from Domain.Students import Student, Group
-from Domain.Teachers import Teacher
+from .Domain import User, Course, Student, Group, Teacher
 
 
-@app.route('/')
+APP = Flask(__name__)
+APP.config.from_object(Config)
+DB = SQLAlchemy(APP)
+MIGRATE = Migrate(APP, DB)
+
+
+@APP.route('/')
 def hello_world():
     return 'Hello World!'
 
 
 if __name__ == '__main__':
-    app.run()
+    APP.run()
