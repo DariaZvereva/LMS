@@ -12,7 +12,7 @@ setup(
     url="https://github.com/DariaZvereva/LMS",
     license="MIT",
     packages=[
-        "LMS",
+        "lms",
     ],
     install_requires=[
     ],
