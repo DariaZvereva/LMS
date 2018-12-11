@@ -15,7 +15,7 @@ setup(
         "lms",
     ],
     install_requires=[
-    ],
+        'flask'],
     setup_requires=[
         "pytest-runner",
         "pytest-pylint",

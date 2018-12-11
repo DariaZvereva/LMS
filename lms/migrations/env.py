@@ -3,6 +3,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 import logging
+from flask import current_app
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -17,10 +18,11 @@ logger = logging.getLogger('alembic.env')
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from flask import current_app
+
 config.set_main_option('sqlalchemy.url',
                        current_app.config.get('SQLALCHEMY_DATABASE_URI'))
 target_metadata = current_app.extensions['migrate'].db.metadata
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -74,7 +76,7 @@ def run_migrations_online():
                       target_metadata=target_metadata,
                       process_revision_directives=process_revision_directives,
                       **current_app.extensions['migrate'].configure_args)
-    
+
     try:
         with context.begin_transaction():
             context.run_migrations()
@@ -83,6 +85,7 @@ def run_migrations_online():
         raise exception
     finally:
         connection.close()
+
 
 if context.is_offline_mode():
     run_migrations_offline()
