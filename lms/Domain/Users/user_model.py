@@ -1,9 +1,13 @@
-from app import db
+from app import db, login
 from uuid import uuid4 as uid
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from Domain.Teachers import Teacher
 from Domain.Students import Student
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 class User(UserMixin, db.Model):

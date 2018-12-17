@@ -3,7 +3,7 @@ from flask import Flask, request, Response
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager, current_user, login_user
+from flask_login import LoginManager, current_user, login_user, logout_user
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'you-will-never-guess'
@@ -80,6 +80,19 @@ def login():
         else:
             raise Exception(str(form.errors.items()))
 
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    js = json.dumps(answer)
+    resp = Response(js, status=200, mimetype='application/json')
+    return resp
+
+@app.route('/logout')
+def logout():
+    answer = blank_resp()
+    try:
+        logout_user()
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)
