@@ -21,17 +21,24 @@ class RegistrationForm(Form):
     email = StringField('Email Address', [validators.Length(min=6, max=35)])
     name = StringField('Name', [validators.Length(min=3, max=35)])
     surname = StringField('Surname', [validators.Length(min=3, max=35)])
+    second_name = StringField('Surname', [validators.Length(min=3, max=35)])
     password = PasswordField('New Password', [
         validators.DataRequired()
     ])
 
+def blank_resp():
+    return {
+        'data': [],
+        'error_message': '',
+        'status': 'ok'
+    }
 
 def register_user_in(form):
-    # TODO:
     u = User(username=form.username.data,
              email=form.email.data,
              name=form.name.data,
-             surname=form.surname.data)
+             surname=form.surname.data,
+             second_name=form.second_name.data)
     db.session.add(u)
     db.session.commit()
     return 0
@@ -43,12 +50,8 @@ def hello_world():
 
 
 @app.route('/register', methods=['POST'])
-def registration_user():
-    answer = {
-        'data': [],
-        'error_message': '',
-        'status': 'ok'
-    }
+def register_user():
+    answer = blank_resp()
     form = RegistrationForm(request.form)
     if form.validate():
         register_user_in(form)
@@ -58,7 +61,20 @@ def registration_user():
 
     js = json.dumps(answer)
     resp = Response(js, status=200, mimetype='application/json')
+    return resp
 
+
+@app.route('/get_all_users', methods=['GET'])
+def get_all_users():
+    answer = blank_resp()
+
+    try:
+        answer['data'] = str(User.query.all())
+    except Exception as e:
+        answer['error_message'] = str(e)
+
+    js = json.dumps(answer)
+    resp = Response(js, status=200, mimetype='application/json')
     return resp
 
 

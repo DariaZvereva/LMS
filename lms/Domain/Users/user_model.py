@@ -13,8 +13,9 @@ class User(db.Model):
     name = db.Column(db.String(64))
     surname = db.Column(db.String(64))
     second_name = db.Column(db.String(64))
-    student = db.relationship('student', backref='user', lazy='dynamic', uselist=False)
-    teacher = db.relationship('teacher', backref='user', lazy='dynamic', uselist=False)
+    # expects a class
+    student = db.relationship('Student', backref='user', uselist=False)
+    teacher = db.relationship('Teacher', backref='user', uselist=False)
 
     def __repr__(self):
         return '<User {username}, {name} {second_name} {surname}>'.format(username=self.username, name=self.name, second_name=self.second_name,
