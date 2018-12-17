@@ -13,18 +13,26 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 
-from utils import blank_resp, RegistrationForm, LoginForm, CourseForm
+from utils import blank_resp, PreliminaryRegistrationForm, LoginForm, CourseForm
 from Domain.Users import User
 from Domain.Courses import Course
 from Domain.Students import Student, Group
 from Domain.Teachers import Teacher
 
 def register_user_in(form):
-    user = User(username=form.username.data,
-             email=form.email.data,
-             name=form.name.data,
-             surname=form.surname.data,
-             second_name=form.second_name.data)
+    #TODO: упростить
+    user = User(
+        username=form.username.data,
+        email=form.email.data,
+        name=form.name.data,
+        surname=form.surname.data,
+        second_name=form.second_name.data,
+        group=form.group.data,
+        year=form.year.data,
+        degree=form.degree.data,
+        education=form.education.data,
+        basis=form.basis.data
+    )
     user.set_password(form.password.data)
     db.session.add(user)
     db.session.commit()
@@ -39,10 +47,14 @@ def hello_world():
     return 'Hello World!'
 
 
-@app.route('/register', methods=['POST'])
-def register_user():
+@app.route('/preliminary_register', methods=['POST'])
+# @login_required
+def preliminary_register_user():
+    """Администратор может добавить предопределенного пользователя (студента или преподавателя)
+
+    """
     answer = blank_resp()
-    form = RegistrationForm(request.form)
+    form = PreliminaryRegistrationForm(request.form)
     if form.validate():
         register_user_in(form)
     else:
