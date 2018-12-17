@@ -20,31 +20,24 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(64))
     surname = db.Column(db.String(64))
     second_name = db.Column(db.String(64))
+    status = db.Column(db.String(64))
     student = db.relationship('Student', backref='user', uselist=False)
     teacher = db.relationship('Teacher', backref='user', uselist=False)
-    # education
-    group = db.Column(db.String(8))
-    year = db.Column(db.Integer())
-    degree = db.Column(db.String(16))
-    education = db.Column(db.String(16))
-    basis = db.Column(db.String(16))
 
     def __repr__(self):
-        return '<User {username}, {name} {second_name} {surname}>'.format(
-            username=self.username, name=self.name,
-            second_name=self.second_name, surname=self.surname)
-
-    def get_data(self):
-        return 'Логин: {username}, ' \
+        return 'Id: {id}, ' \
+               'Логин: {username}, ' \
                'Email: {email}, ' \
-               'ФИО: {surname} {name} {second_name},' \
-               'Учебная группа: {group}, Год поступления: {year}, Степень: {degree},' \
-               'Форма обучения: {education}, Основа обучения: {basis}'.format(
+               'ФИО: {surname} {name} {second_name} |'.format(
             username=self.username, email=self.email, name=self.name,
-            second_name=self.second_name, surname=self.surname,
-            group=self.group, year=self.year, degree=self.degree, education=self.education,
-            basis=self.basis
+            second_name=self.second_name, surname=self.surname, id=self.id
         )
+
+    def get_user_id(self):
+        return self.id
+
+    def get_status(self):
+        return self.status
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
