@@ -1,4 +1,4 @@
-from app import db
+from lms.app import db
 
 
 class Teacher(db.Model):

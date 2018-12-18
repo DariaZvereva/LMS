@@ -1,5 +1,4 @@
-from app import db
-from Domain.Students import Group
+from lms.app import db
 
 
 class Student(db.Model):
