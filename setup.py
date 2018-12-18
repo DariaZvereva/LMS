@@ -4,6 +4,8 @@
 
 from setuptools import setup
 
+requirements = map(str.strip, open("requirements.txt").readlines())
+
 setup(
     name="LMS",
     version="0.0.0",
@@ -14,14 +16,16 @@ setup(
     packages=[
         "lms",
     ],
-    install_requires=[
-        'flask'],
+    install_requires=requirements,
     setup_requires=[
         "pytest-runner",
         "pytest-pylint",
         "pytest-pycodestyle",
         "pytest-pep257",
         "pytest-cov",
+        "Flask-SQLAlchemy",
+        "Flask-Migrate",
+        "SQLAlchemy"
     ],
     tests_require=[
         "pytest",
