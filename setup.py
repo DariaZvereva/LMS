@@ -14,8 +14,9 @@ setup(
     url="https://github.com/DariaZvereva/LMS",
     license="MIT",
     packages=[
-        "lms",
+        "lms"
     ],
+    package_dir={"", "lms"},
     install_requires=requirements,
     setup_requires=[
         "pytest-runner",
