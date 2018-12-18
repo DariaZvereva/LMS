@@ -2,6 +2,13 @@ from wtforms import Form, StringField, PasswordField, validators, IntegerField
 from wtforms.validators import DataRequired, ValidationError
 from Domain.Users import User
 
+
+class PersonalInfoForm(Form):
+    phone = StringField('Phone', [validators.Length(max=10)])
+    city = StringField('City', [validators.Length(max=20)])
+    description = StringField('Description', [validators.Length(max=200)])
+
+
 class CourseForm(Form):
     name = StringField('Name', [validators.Length(min=3, max=25)])
     description = StringField('Description', [validators.Length(min=0, max=50)])

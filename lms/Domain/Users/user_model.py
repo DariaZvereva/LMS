@@ -23,14 +23,20 @@ class User(UserMixin, db.Model):
     status = db.Column(db.String(64))
     student = db.relationship('Student', backref='user', uselist=False)
     teacher = db.relationship('Teacher', backref='user', uselist=False)
+    phone = db.Column(db.String(64))
+    city = db.Column(db.String(64))
+    description = db.Column(db.String(256))
 
     def __repr__(self):
-        return 'Id: {id}, ' \
+        return '| Id: {id}, ' \
                'Логин: {username}, ' \
                'Email: {email}, ' \
-               'ФИО: {surname} {name} {second_name} |'.format(
+               'ФИО: {surname} {name} {second_name}, ' \
+               'Телефон: {phone}, Город: {city}, ' \
+               'Описание: {descripption} |'.format(
             username=self.username, email=self.email, name=self.name,
-            second_name=self.second_name, surname=self.surname, id=self.id
+            second_name=self.second_name, surname=self.surname, id=self.id,
+            phone=self.phone, city=self.city, descripption=self.description
         )
 
     def get_user_id(self):
@@ -50,6 +56,11 @@ class User(UserMixin, db.Model):
 
     def set_email(self, email):
         self.email = email
+
+    def set_personal_info(self, phone, city, description):
+        self.phone = phone
+        self.city = city
+        self.description = description
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

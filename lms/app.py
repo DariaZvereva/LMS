@@ -1,5 +1,4 @@
-import json
-from flask import Flask, request, Response
+from flask import Flask, request
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,7 +14,7 @@ login = LoginManager(app)
 
 from utils import blank_resp, init_user, init_student, get_response
 from forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
-    LoginForm, CourseForm
+    LoginForm, CourseForm, PersonalInfoForm
 from Domain.Users import User
 from Domain.Courses import Course
 from Domain.Students import Student, Group
@@ -140,9 +139,15 @@ def user(username):
     answer = blank_resp()
 
     try:
-        if request.method == 'GET':
-            user = User.query.filter_by(username=username).first_or_404()
-            answer['data'] = user.get_data()
+        user = User.query.filter_by(username=username).first_or_404()
+        if request.method == 'POST':
+            form = PersonalInfoForm(request.form)
+            if form.validate():
+                user.set_personal_info(form.phone.data, form.city.data, form.description.data)
+                db.session.commit()
+            else:
+                raise Exception(str(form.errors.items()))
+        answer['data'] = str(user)
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)
