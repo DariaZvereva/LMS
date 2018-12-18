@@ -38,5 +38,8 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-    ]
+    ],
+    entry_points={
+        'console_scripts': ['lms=lms.app:main'],
+    }
 )
