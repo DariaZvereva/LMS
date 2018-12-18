@@ -16,7 +16,7 @@ setup(
     packages=[
         "lms"
     ],
-    package_dir={"", "lms"},
+    package_dir={"": "lms"},
     install_requires=requirements,
     setup_requires=[
         "pytest-runner",
@@ -41,6 +41,6 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     entry_points={
-        'console_scripts': ['lms=lms.app:main'],
+        'console_scripts': ['lms=app:main'],
     }
 )
