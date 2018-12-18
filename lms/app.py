@@ -58,7 +58,7 @@ def preliminary_register_user():
                     db.session.delete(user)
                     db.session.commit()
                     raise Exception(str(form_student.errors.items()))
-
+            answer['data'] = str({'validation_code': user.get_registration_uid()})
         else:
             raise Exception(str(form.errors.items()))
 

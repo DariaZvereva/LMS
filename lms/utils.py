@@ -1,5 +1,10 @@
+import random
+import string
 from Domain.Users import User
 from Domain.Students import Student
+
+def generate_validation_code(N=6):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
 
 def blank_resp():
     return {
@@ -15,7 +20,8 @@ def get_user_from_form(form):
         name=form.name.data,
         surname=form.surname.data,
         second_name=form.second_name.data,
-        status=form.status.data
+        status=form.status.data,
+        registration_uid=generate_validation_code()
     )
 
 def get_student_from_form(form, user_id):

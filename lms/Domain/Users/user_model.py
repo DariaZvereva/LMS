@@ -39,6 +39,9 @@ class User(UserMixin, db.Model):
     def get_status(self):
         return self.status
 
+    def get_registration_uid(self):
+        return self.registration_uid
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
