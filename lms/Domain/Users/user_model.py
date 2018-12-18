@@ -45,6 +45,12 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
+    def set_username(self, username):
+        self.username = username
+
+    def set_email(self, email):
+        self.email = email
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 

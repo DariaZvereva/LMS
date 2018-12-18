@@ -13,8 +13,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 
-from utils import blank_resp, get_user_from_form, get_student_from_form
-from forms import PreliminaryRegForm, PreliminaryStudentRegForm, LoginForm, CourseForm
+from utils import blank_resp, init_user, init_student, get_response
+from forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
+    LoginForm, CourseForm
 from Domain.Users import User
 from Domain.Courses import Course
 from Domain.Students import Student, Group
@@ -41,8 +42,7 @@ def preliminary_register_user():
     try:
         form = PreliminaryRegForm(request.form)
         if form.validate():
-            user = get_user_from_form(form)
-            user.set_password(form.password.data)
+            user = init_user(form)
 
             db.session.add(user)
             db.session.commit()
@@ -51,7 +51,7 @@ def preliminary_register_user():
                 form_student = PreliminaryStudentRegForm(request.form)
                 if form_student.validate():
                     user_id = user.get_user_id()
-                    student = get_student_from_form(form_student, user_id)
+                    student = init_student(form_student, user_id)
                     db.session.add(student)
                     db.session.commit()
                 else:
@@ -66,10 +66,33 @@ def preliminary_register_user():
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
+@app.route('/register', methods=['POST'])
+def register_user():
+    """Пользователь может зарегистрироваться в системе по коду регистрации, полученного от администратора.
+
+    """
+    answer = blank_resp()
+
+    try:
+        registration_uid = request.form.get('validation_code')
+        user = User.query.filter_by(registration_uid=registration_uid).first_or_404()
+
+        form = RegForm(request.form)
+        if form.validate():
+            user.set_username(form.username.data)
+            user.set_email(form.email.data)
+            user.set_password(form.password.data)
+
+            db.session.commit()
+        else:
+            raise Exception(str(form.errors.items()))
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    return get_response(answer)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -94,9 +117,7 @@ def login():
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 @app.route('/logout')
 def logout():
@@ -107,9 +128,7 @@ def logout():
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
@@ -128,9 +147,22 @@ def user(username):
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
+
+@app.route('/validation_code/<id>', methods=['GET'])
+@login_required
+def validation_code(id):
+    answer = blank_resp()
+
+    try:
+        if request.method == 'GET':
+            user = User.query.filter_by(id=id).first_or_404()
+            answer['data'] = user.get_registration_uid()
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    return get_response(answer)
 
 
 @app.route('/create_course', methods=['GET', 'POST'])
@@ -148,12 +180,9 @@ def create_course():
         answer['status'] = 'error'
         answer['error_message'] = str(form.errors.items())
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 
-# TODO: дублирование кода: переделать
 @app.route('/get_all', methods=['GET'])
 def get_all():
     answer = blank_resp()
@@ -172,9 +201,7 @@ def get_all():
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 
 if __name__ == '__main__':
