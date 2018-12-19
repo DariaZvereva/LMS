@@ -10,4 +10,4 @@ env:
 script:
   - ./setup.py test
 after_success:
-  - codecov --token="625ecb3f-fb87-4093-8e25-e126fb4f71f0"
+  - codecov
