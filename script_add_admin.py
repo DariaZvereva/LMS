@@ -27,7 +27,7 @@ def register_admin(event):
 # example
 d = MultiDict({
     'status': 'admin',
-    'username': 'admin1',
+    'username': 'admin',
     'email': 'admin@mail.ru',
     'password': 'qwerty',
     'name': 'Admin',

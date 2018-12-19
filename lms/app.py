@@ -14,8 +14,8 @@ loginManager = LoginManager(app)
 
 
 from lms.utils import blank_resp, init_user, init_student, get_response
-from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
-    LoginForm, CourseForm, PersonalInfoForm
+from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm, \
+    LoginForm, CourseForm, PersonalInfoForm, GroupForm
 from lms.Domain.Users import User
 from lms.Domain.Courses import Course
 from lms.Domain.Students import Student, Group
@@ -25,6 +25,12 @@ from lms.Domain.Teachers import Teacher
 def add_course_in(form):
     course = Course(name=form.name.data, description=form.name.data)
     db.session.add(course)
+    db.session.commit()
+
+def add_group_in(form):
+    group = Group(name=form.name.data, department=form.department.data,
+                   grade=form.grade.data)
+    db.session.add(group)
     db.session.commit()
 
 
@@ -190,7 +196,7 @@ def validation_code(id):
     return get_response(answer)
 
 
-@app.route('/create_course', methods=['GET', 'POST'])
+@app.route('/create_course', methods=['POST'])
 @login_required
 def create_course():
     """ Администратор может создать учебный курс, указав его название и текстовое описание.
@@ -213,6 +219,29 @@ def create_course():
     return get_response(answer)
 
 
+@app.route('/create_group', methods=['POST'])
+@login_required
+def create_group():
+    """ Администратор может создать учебную группу, указав следующие данные:
+        Имя группы, Имя факультета, Номер курса
+
+    """
+    answer = blank_resp()
+
+    try:
+        if current_user.status != 'admin':
+            raise Exception('Only admins can create group')
+        form = GroupForm(request.form)
+        if form.validate():
+            add_group_in(form)
+        else:
+            raise Exception(str(form.errors.items()))
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    return get_response(answer)
+
 @app.route('/get_all', methods=['GET'])
 @login_required
 def get_all():
@@ -228,6 +257,8 @@ def get_all():
             answer['data'] = str(Course.query.all())
         elif type == 'students':
             answer['data'] = str(Student.query.all())
+        elif type == 'groups':
+            answer['data'] = str(Group.query.all())
         else:
             raise Exception('Invalid type')
     except Exception as e:

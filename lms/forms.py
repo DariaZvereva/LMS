@@ -14,6 +14,11 @@ class CourseForm(Form):
     description = StringField('Description', [validators.Length(min=0, max=50)])
 
 
+class GroupForm(Form):
+    name = StringField('Name', [validators.Length(min=3, max=25)])
+    department = StringField('Department', [validators.Length(min=3, max=25)])
+    grade = IntegerField('Grade', [validators.NumberRange(min=1, max=8)])
+
 class RegForm(Form):
     username = StringField('Username', [validators.Length(min=4, max=25)])
     email = StringField('Email Address', [validators.Email(), validators.Length(min=6, max=35)])
