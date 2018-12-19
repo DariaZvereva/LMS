@@ -27,12 +27,14 @@ def add_course_in(form):
     db.session.add(course)
     db.session.commit()
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
 
+
 @app.route('/preliminary_register', methods=['POST'])
-# @login_required
+@login_required
 def preliminary_register_user():
     """Администратор может добавить предопределенного пользователя (студента или преподавателя)
 
@@ -40,6 +42,8 @@ def preliminary_register_user():
     answer = blank_resp()
 
     try:
+        if current_user.status != 'admin':
+            raise Exception('Only admins can do preliminary registration')
         form = PreliminaryRegForm(request.form)
         if form.validate():
             user = init_user(form)
@@ -68,6 +72,7 @@ def preliminary_register_user():
 
     return get_response(answer)
 
+
 @app.route('/register', methods=['POST'])
 def register_user():
     """Пользователь может зарегистрироваться в системе по коду регистрации, полученного от администратора.
@@ -94,6 +99,7 @@ def register_user():
 
     return get_response(answer)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Пользователь может войти в систему по своему e-mail и паролю.
@@ -118,6 +124,7 @@ def login():
         answer['error_message'] = str(e)
 
     return get_response(answer)
+
 
 @app.route('/logout')
 def logout():
@@ -155,12 +162,15 @@ def user(username):
 
     return get_response(answer)
 
+
 @app.route('/validation_code/<id>', methods=['GET'])
 @login_required
 def validation_code(id):
     answer = blank_resp()
 
     try:
+        if current_user.status != 'admin':
+            raise Exception('Only admins can see validation code')
         if request.method == 'GET':
             user = User.query.filter_by(id=id).first_or_404()
             answer['data'] = user.get_registration_uid()
@@ -179,21 +189,29 @@ def create_course():
     """
     answer = blank_resp()
 
-    form = CourseForm(request.form)
-    if form.validate():
-        add_course_in(form)
-    else:
+    try:
+        if current_user.status != 'admin':
+            raise Exception('Only admins can create course')
+        form = CourseForm(request.form)
+        if form.validate():
+            add_course_in(form)
+        else:
+            raise Exception(str(form.errors.items()))
+    except Exception as e:
         answer['status'] = 'error'
-        answer['error_message'] = str(form.errors.items())
+        answer['error_message'] = str(e)
 
     return get_response(answer)
 
 
 @app.route('/get_all', methods=['GET'])
+@login_required
 def get_all():
     answer = blank_resp()
 
     try:
+        if current_user.status != 'admin':
+            raise Exception('Only admins can get full information')
         type = request.args.get('type')
         if type == 'users':
             answer['data'] = str(User.query.all())
