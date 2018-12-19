@@ -2,8 +2,8 @@ import random
 import string
 import json
 from flask import Response
-from Domain.Users import User
-from Domain.Students import Student
+from lms.Domain.Users import User
+from lms.Domain.Students import Student
 
 def get_response(answer):
     js = json.dumps(answer)

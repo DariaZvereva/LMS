@@ -1,17 +1,13 @@
-from app import db, login
+from lms.app import db
 from uuid import uuid4 as uid
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from Domain.Teachers import Teacher
-from Domain.Students import Student
-
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
+from lms.Domain.Teachers import Teacher
+from lms.Domain.Students import Student
 
 class User(UserMixin, db.Model):
-    # personal
+    __tablename__ = "users"
+    __table_args__ = {"useexisting": True}
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
