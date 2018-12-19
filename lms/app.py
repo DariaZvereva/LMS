@@ -141,21 +141,30 @@ def logout():
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
-    """Пользователь может просмотреть (GET) и отредактировать (POST) свой профиль
+    """Пользователь может просмотреть (GET) и отредактировать (POST) свой профиль.
+    Помимо своего личного профиля, пользователь также может просматривать профили других пользователей системы.
+    Однако, основу обучения видеть другие пользователи не могут.
 
     """
     answer = blank_resp()
 
     try:
         user = User.query.filter_by(username=username).first_or_404()
+        if request.method == 'GET':
+            if current_user.username == username:
+                answer['data'] = 'full' + user.get_full_info()
+            else:
+                answer['data'] = str(user)
         if request.method == 'POST':
+            if current_user.username != username:
+                raise Exception('You can\'t edit this page')
             form = PersonalInfoForm(request.form)
             if form.validate():
                 user.set_personal_info(form.phone.data, form.city.data, form.description.data)
                 db.session.commit()
+                answer['data'] = str(user)
             else:
                 raise Exception(str(form.errors.items()))
-        answer['data'] = str(user)
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)
