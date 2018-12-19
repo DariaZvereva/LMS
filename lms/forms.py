@@ -1,6 +1,6 @@
 from wtforms import Form, StringField, PasswordField, validators, IntegerField
 from wtforms.validators import DataRequired, ValidationError
-from Domain.Users import User
+from lms.Domain.Users import User
 
 
 class PersonalInfoForm(Form):
