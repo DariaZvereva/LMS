@@ -1,6 +1,16 @@
-from wtforms import Form, StringField, PasswordField, validators
-from wtforms.validators import DataRequired, ValidationError
+import random
+import string
+import json
+from flask import Response
 from lms.Domain.Users import User
+from lms.Domain.Students import Student
+
+def get_response(answer):
+    js = json.dumps(answer)
+    return Response(js, status=200, mimetype='application/json')
+
+def generate_validation_code(N=6):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
 
 def blank_resp():
     return {
@@ -9,33 +19,21 @@ def blank_resp():
         'status': 'ok'
     }
 
+def init_user(form):
+    return User(
+        name=form.name.data,
+        surname=form.surname.data,
+        second_name=form.second_name.data,
+        status=form.status.data,
+        registration_uid=generate_validation_code()
+    )
 
-class CourseForm(Form):
-    name = StringField('Name', [validators.Length(min=3, max=25)])
-    description = StringField('Description', [validators.Length(min=0, max=50)])
-
-
-class RegistrationForm(Form):
-    username = StringField('Username', [validators.Length(min=4, max=25)])
-    email = StringField('Email Address', [validators.Length(min=6, max=35)])
-    name = StringField('Name', [validators.Length(min=3, max=35)])
-    surname = StringField('Surname', [validators.Length(min=3, max=35)])
-    second_name = StringField('Surname', [validators.Length(min=3, max=35)])
-    password = PasswordField('New Password', [
-        validators.DataRequired()
-    ])
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different username.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')
-
-
-class LoginForm(Form):
-    email = StringField('email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+def init_student(form, user_id):
+    return Student(
+        user_id=user_id,
+        group_id=form.group_id.data,
+        year=form.year.data,
+        degree=form.degree.data,
+        education_form=form.education_form.data,
+        education_basis=form.education_basis.data
+    )

@@ -1,5 +1,4 @@
-import json
-from flask import Flask, request, Response
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager,\
@@ -11,21 +10,17 @@ app.config['SECRET_KEY'] = 'you-will-never-guess'
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-login = LoginManager(app)
+loginManager = LoginManager(app)
 
-from lms.utils import blank_resp, RegistrationForm, LoginForm, CourseForm
+
+from lms.utils import blank_resp, init_user, init_student, get_response
+from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
+    LoginForm, CourseForm, PersonalInfoForm
 from lms.Domain.Users import User
 from lms.Domain.Courses import Course
+from lms.Domain.Students import Student, Group
+from lms.Domain.Teachers import Teacher
 
-def register_user_in(form):
-    user = User(username=form.username.data,
-             email=form.email.data,
-             name=form.name.data,
-             surname=form.surname.data,
-             second_name=form.second_name.data)
-    user.set_password(form.password.data)
-    db.session.add(user)
-    db.session.commit()
 
 def add_course_in(form):
     course = Course(name=form.name.data, description=form.name.data)
@@ -36,36 +31,68 @@ def add_course_in(form):
 def hello_world():
     return 'Hello World!'
 
+@app.route('/preliminary_register', methods=['POST'])
+# @login_required
+def preliminary_register_user():
+    """Администратор может добавить предопределенного пользователя (студента или преподавателя)
 
-@app.route('/register', methods=['POST'])
-def register_user():
-    answer = blank_resp()
-    form = RegistrationForm(request.form)
-    if form.validate():
-        register_user_in(form)
-    else:
-        answer['status'] = 'error'
-        answer['error_message'] = str(form.errors.items())
-
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
-
-
-@app.route('/get_all_users', methods=['GET'])
-def get_all_users():
+    """
     answer = blank_resp()
 
     try:
-        answer['data'] = str(User.query.all())
+        form = PreliminaryRegForm(request.form)
+        if form.validate():
+            user = init_user(form)
+
+            db.session.add(user)
+            db.session.commit()
+
+            if user.get_status() == 'student':
+                form_student = PreliminaryStudentRegForm(request.form)
+                if form_student.validate():
+                    user_id = user.get_user_id()
+                    student = init_student(form_student, user_id)
+                    db.session.add(student)
+                    db.session.commit()
+                else:
+                    db.session.delete(user)
+                    db.session.commit()
+                    raise Exception(str(form_student.errors.items()))
+            answer['data'] = str({'validation_code': user.get_registration_uid()})
+        else:
+            raise Exception(str(form.errors.items()))
+
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
+@app.route('/register', methods=['POST'])
+def register_user():
+    """Пользователь может зарегистрироваться в системе по коду регистрации, полученного от администратора.
+
+    """
+    answer = blank_resp()
+
+    try:
+        registration_uid = request.form.get('validation_code')
+        user = User.query.filter_by(registration_uid=registration_uid).first_or_404()
+
+        form = RegForm(request.form)
+        if form.validate():
+            user.set_username(form.username.data)
+            user.set_email(form.email.data)
+            user.set_password(form.password.data)
+
+            db.session.commit()
+        else:
+            raise Exception(str(form.errors.items()))
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    return get_response(answer)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,9 +117,7 @@ def login():
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 @app.route('/logout')
 def logout():
@@ -103,9 +128,7 @@ def logout():
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
@@ -117,16 +140,35 @@ def user(username):
     answer = blank_resp()
 
     try:
-        if request.method == 'GET':
-            user = User.query.filter_by(username=username).first_or_404()
-            answer['data'] = user.get_data();
+        user = User.query.filter_by(username=username).first_or_404()
+        if request.method == 'POST':
+            form = PersonalInfoForm(request.form)
+            if form.validate():
+                user.set_personal_info(form.phone.data, form.city.data, form.description.data)
+                db.session.commit()
+            else:
+                raise Exception(str(form.errors.items()))
+        answer['data'] = str(user)
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
+
+@app.route('/validation_code/<id>', methods=['GET'])
+@login_required
+def validation_code(id):
+    answer = blank_resp()
+
+    try:
+        if request.method == 'GET':
+            user = User.query.filter_by(id=id).first_or_404()
+            answer['data'] = user.get_registration_uid()
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    return get_response(answer)
 
 
 @app.route('/create_course', methods=['GET', 'POST'])
@@ -144,24 +186,28 @@ def create_course():
         answer['status'] = 'error'
         answer['error_message'] = str(form.errors.items())
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 
-@app.route('/get_all_courses', methods=['GET'])
-def get_all_courses():
+@app.route('/get_all', methods=['GET'])
+def get_all():
     answer = blank_resp()
 
     try:
-        answer['data'] = str(Course.query.all())
+        type = request.args.get('type')
+        if type == 'users':
+            answer['data'] = str(User.query.all())
+        elif type == 'courses':
+            answer['data'] = str(Course.query.all())
+        elif type == 'students':
+            answer['data'] = str(Student.query.all())
+        else:
+            raise Exception('Invalid type')
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)
 
-    js = json.dumps(answer)
-    resp = Response(js, status=200, mimetype='application/json')
-    return resp
+    return get_response(answer)
 
 
 if __name__ == '__main__':
