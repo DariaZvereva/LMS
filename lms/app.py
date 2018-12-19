@@ -1,10 +1,10 @@
 import json
 from flask import Flask, request, Response
-from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager,\
     current_user, login_user, logout_user, login_required
+from lms.config import Config
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'you-will-never-guess'
@@ -13,11 +13,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 
-from utils import blank_resp, RegistrationForm, LoginForm, CourseForm
-from Domain.Users import User
-from Domain.Courses import Course
-from Domain.Students import Student, Group
-from Domain.Teachers import Teacher
+from lms.utils import blank_resp, RegistrationForm, LoginForm, CourseForm
+from lms.Domain.Users import User
+from lms.Domain.Courses import Course
 
 def register_user_in(form):
     user = User(username=form.username.data,

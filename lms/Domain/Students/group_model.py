@@ -1,7 +1,9 @@
-from app import db
+from lms.app import db
 
 
 class Group(db.Model):
+    __tablename__ = "groups"
+    __table_args__ = {"useexisting": True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     grade = db.Column(db.Integer)
