@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = 'you-will-never-guess'
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-login = LoginManager(app)
+loginManager = LoginManager(app)
 
 
 from lms.utils import blank_resp, init_user, init_student, get_response
