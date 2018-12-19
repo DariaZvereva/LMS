@@ -1,9 +1,9 @@
 from flask import Flask, request
-from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager,\
     current_user, login_user, logout_user, login_required
+from lms.config import Config
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'you-will-never-guess'
@@ -12,13 +12,13 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 
-from utils import blank_resp, init_user, init_student, get_response
-from forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
+
+from lms.utils import blank_resp, init_user, init_student, get_response
+from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
     LoginForm, CourseForm, PersonalInfoForm
-from Domain.Users import User
-from Domain.Courses import Course
-from Domain.Students import Student, Group
-from Domain.Teachers import Teacher
+from lms.Domain.Users import User
+from lms.Domain.Courses import Course
+from lms.Domain.Students import Student
 
 
 def add_course_in(form):
