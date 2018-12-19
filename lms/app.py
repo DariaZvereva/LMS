@@ -18,7 +18,8 @@ from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm,\
     LoginForm, CourseForm, PersonalInfoForm
 from lms.Domain.Users import User
 from lms.Domain.Courses import Course
-from lms.Domain.Students import Student
+from lms.Domain.Students import Student, Group
+from lms.Domain.Teachers import Teacher
 
 
 def add_course_in(form):
