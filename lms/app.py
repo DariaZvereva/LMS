@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager,\
+from flask_login import LoginManager, \
     current_user, login_user, logout_user, login_required
 from lms.config import Config
 
@@ -11,7 +11,6 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 loginManager = LoginManager(app)
-
 
 from lms.utils import blank_resp, init_user, init_student, get_response
 from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm, \
@@ -27,9 +26,10 @@ def add_course_in(form):
     db.session.add(course)
     db.session.commit()
 
+
 def add_group_in(form):
     group = Group(name=form.name.data, department=form.department.data,
-                   grade=form.grade.data)
+                  grade=form.grade.data)
     db.session.add(group)
     db.session.commit()
 
@@ -61,7 +61,11 @@ def preliminary_register_user():
                 form_student = PreliminaryStudentRegForm(request.form)
                 if form_student.validate():
                     user_id = user.get_user_id()
-                    student = init_student(form_student, user_id)
+                    group = Group.query.filter_by(name=form_student.group.data).first()
+                    if group is None:
+                        raise Exception('This group doesn\'t exist. Please, firstly, create group.')
+                    group_id = group.get_id()
+                    student = init_student(form_student, user_id, group_id)
                     db.session.add(student)
                     db.session.commit()
                 else:
@@ -242,6 +246,7 @@ def create_group():
 
     return get_response(answer)
 
+
 @app.route('/get_all', methods=['GET'])
 @login_required
 def get_all():
@@ -261,6 +266,32 @@ def get_all():
             answer['data'] = str(Group.query.all())
         else:
             raise Exception('Invalid type')
+    except Exception as e:
+        answer['status'] = 'error'
+        answer['error_message'] = str(e)
+
+    return get_response(answer)
+
+
+@app.route('/get_my_classmates', methods=['GET'])
+@login_required
+def get_my_classmates():
+    """Студент может просматривать список своих одногруппников.
+
+    """
+    answer = blank_resp()
+
+    try:
+        username = current_user.username
+        user = User.query.filter_by(username=username).first()
+        user_id = user.get_id()
+        student = Student.query.filter_by(user_id=user_id).first()
+        if student is None:
+            raise Exception('You are not student')
+        group_id = student.get_group_id()
+        answer['qwerty'] = group_id
+        students = Student.query.filter_by(group_id=group_id).all()
+        answer['data'] = str(students)
     except Exception as e:
         answer['status'] = 'error'
         answer['error_message'] = str(e)

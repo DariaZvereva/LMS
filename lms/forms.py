@@ -38,7 +38,7 @@ class RegForm(Form):
 
 
 class PreliminaryStudentRegForm(Form):
-    group_id = StringField('Group', [validators.Length(min=1, max=5)])
+    group = StringField('Group', [validators.Length(min=1, max=5)])
     year = IntegerField('Year', [validators.NumberRange(min=1900, max=2016)])
     degree = StringField('Degree', [validators.AnyOf(['bachelor', 'specialist', 'master'])])
     education_form = StringField('Education', [validators.AnyOf(['full', 'part', 'evening'])])
