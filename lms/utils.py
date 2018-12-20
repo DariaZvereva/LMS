@@ -7,6 +7,8 @@ from lms.Domain.Students import Student
 
 def get_response(answer):
     js = json.dumps(answer)
+    if answer.get('status') == 'error':
+        return Response(js, status=400, mimetype='application/json')
     return Response(js, status=200, mimetype='application/json')
 
 def generate_validation_code(N=6):
@@ -37,3 +39,16 @@ def init_student(form, user_id):
         education_form=form.education_form.data,
         education_basis=form.education_basis.data
     )
+
+def init_full_user(form):
+    u = User(
+        name=form.name.data,
+        surname=form.surname.data,
+        second_name=form.second_name.data,
+        status=form.status.data,
+        registration_uid=generate_validation_code(),
+        email=form.email.data,
+        username=form.username.data
+    )
+    u.set_password(form.password.data)
+    return u

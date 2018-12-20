@@ -41,6 +41,11 @@ class User(db.Model, UserMixin):
             phone=self.phone, city=self.city, descripption=self.description
         )
 
+    def get_full_info(self):
+        student = Student.query.filter_by(user_id=self.id).first()
+        education_part = str(student) if student else ' | No education | '
+        return str(self) + education_part
+
     def get_user_id(self):
         return self.id
 

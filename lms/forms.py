@@ -14,6 +14,11 @@ class CourseForm(Form):
     description = StringField('Description', [validators.Length(min=0, max=50)])
 
 
+class GroupForm(Form):
+    name = StringField('Name', [validators.Length(min=3, max=25)])
+    department = StringField('Department', [validators.Length(min=3, max=25)])
+    grade = IntegerField('Grade', [validators.NumberRange(min=1, max=8)])
+
 class RegForm(Form):
     username = StringField('Username', [validators.Length(min=4, max=25)])
     email = StringField('Email Address', [validators.Email(), validators.Length(min=6, max=35)])
@@ -50,3 +55,25 @@ class PreliminaryRegForm(Form):
 class LoginForm(Form):
     email = StringField('email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+
+
+class AdminForm(Form):
+    name = StringField('Name', [validators.Length(min=3, max=35)])
+    surname = StringField('Surname', [validators.Length(min=3, max=35)])
+    second_name = StringField('Surname', [validators.Length(min=3, max=35)])
+    status = StringField('Status', [validators.AnyOf(['admin'])])
+    username = StringField('Username', [validators.Length(min=4, max=25)])
+    email = StringField('Email Address', [validators.Email(), validators.Length(min=6, max=35)])
+    password = PasswordField('New Password', [
+        validators.DataRequired()
+    ])
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different username.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different email address.')
