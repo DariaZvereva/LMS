@@ -11,3 +11,6 @@ class Course(db.Model):
     def __repr__(self):
         return '<Course {name}>'.format(name=self.name)
 
+    def get_id(self):
+        return self.id
+

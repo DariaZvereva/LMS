@@ -3,6 +3,11 @@ from wtforms.validators import DataRequired, ValidationError
 from lms.Domain.Users import User
 
 
+class ScheduleForm(Form):
+    group = StringField('Group', [validators.Length(min=3, max=25)])
+    course = StringField('Course', [validators.Length(min=3, max=25)])
+
+
 class PersonalInfoForm(Form):
     phone = StringField('Phone', [validators.Length(max=10)])
     city = StringField('City', [validators.Length(max=20)])
@@ -17,7 +22,6 @@ class CourseForm(Form):
 class GroupForm(Form):
     name = StringField('Name', [validators.Length(min=3, max=25)])
     department = StringField('Department', [validators.Length(min=3, max=25)])
-    grade = IntegerField('Grade', [validators.NumberRange(min=1, max=8)])
 
 class RegForm(Form):
     username = StringField('Username', [validators.Length(min=4, max=25)])
