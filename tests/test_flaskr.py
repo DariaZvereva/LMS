@@ -3,27 +3,16 @@ import unittest
 from flask import jsonify
 import json
 from flask_sqlalchemy import SQLAlchemy
-from lms.app import db, app
+from lms.app import app
 from lms.Domain.Users import User
 from lms.Domain.Courses import Course
 from lms.Domain.Students import Student, Group
 from lms.Domain.Teachers import Teacher
 
+db = SQLAlchemy(app)
+
 
 class appDBTests(unittest.TestCase):
-
-    def populate_db(self):
-        course = Course(name="test course", description="test course desription")
-        user = User(name="test",
-                    surname="test",
-                    second_name="test",
-                    status="teacher",
-                    registration_uid="1234",
-                    email="a@a.ru",
-                    password_hash="")
-        db.session.add(user)
-        db.session.add(course)
-        db.session.commit()
 
     def setUp(self):
         """
@@ -31,10 +20,8 @@ class appDBTests(unittest.TestCase):
         """
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+
         db.init_app(app)
-        with app.app_context():
-            # db.create_all()
-            self.populate_db()
 
     def tearDown(self):
         """
