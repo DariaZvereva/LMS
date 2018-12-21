@@ -20,6 +20,7 @@ setup(
         "pytest-pycodestyle",
         "pytest-pep257",
         "pytest-cov",
+        "pytest-pylint",
         "Flask-SQLAlchemy",
         "Flask-Migrate",
         "SQLAlchemy"

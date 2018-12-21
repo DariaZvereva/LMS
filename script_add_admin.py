@@ -1,7 +1,7 @@
+from werkzeug.datastructures import MultiDict
 from lms.app import db
 from lms.forms import AdminForm
 from lms.utils import init_full_user, blank_resp
-from werkzeug.datastructures import MultiDict
 
 
 def register_admin(event):
@@ -17,15 +17,15 @@ def register_admin(event):
         else:
             raise Exception(str(form.errors.items()))
 
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return answer
 
 
 # example
-d = MultiDict({
+example = MultiDict({
     'status': 'admin',
     'username': 'admin',
     'email': 'admin@mail.ru',
@@ -35,6 +35,6 @@ d = MultiDict({
     'second_name': 'Adminovich'
 })
 
-answer = register_admin(d)
+result = register_admin(example)
 
-print(str(answer))
+print(str(result))

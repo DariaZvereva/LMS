@@ -1,14 +1,15 @@
-from lms.app import db, loginManager
 from uuid import uuid4 as uid
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+
+from lms.app import db, loginManager
 from lms.Domain.Teachers import Teacher
 from lms.Domain.Students import Student
 
 
 @loginManager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(index):
+    return User.query.get(int(index))
 
 
 class User(db.Model, UserMixin):
@@ -36,10 +37,9 @@ class User(db.Model, UserMixin):
                'ФИО: {surname} {name} {second_name}, ' \
                'Телефон: {phone}, Город: {city}, ' \
                'Описание: {descripption} |'.format(
-            username=self.username, email=self.email, name=self.name,
-            second_name=self.second_name, surname=self.surname, id=self.id,
-            phone=self.phone, city=self.city, descripption=self.description
-        )
+                   username=self.username, email=self.email, name=self.name,
+                   second_name=self.second_name, surname=self.surname, id=self.id,
+                   phone=self.phone, city=self.city, descripption=self.description)
 
     def get_full_info(self):
         student = Student.query.filter_by(user_id=self.id).first()

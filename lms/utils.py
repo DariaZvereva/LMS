@@ -6,13 +6,13 @@ from lms.Domain.Users import User
 from lms.Domain.Students import Student
 
 def get_response(answer):
-    js = json.dumps(answer)
+    answer_js = json.dumps(answer)
     if answer.get('status') == 'error':
-        return Response(js, status=400, mimetype='application/json')
-    return Response(js, status=200, mimetype='application/json')
+        return Response(answer_js, status=400, mimetype='application/json')
+    return Response(answer_js, status=200, mimetype='application/json')
 
-def generate_validation_code(N=6):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
+def generate_validation_code(string_length=6):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=string_length))
 
 def blank_resp():
     return {
@@ -41,7 +41,7 @@ def init_student(form, user_id, group_id):
     )
 
 def init_full_user(form):
-    u = User(
+    user = User(
         name=form.name.data,
         surname=form.surname.data,
         second_name=form.second_name.data,
@@ -50,5 +50,5 @@ def init_full_user(form):
         email=form.email.data,
         username=form.username.data
     )
-    u.set_password(form.password.data)
-    return u
+    user.set_password(form.password.data)
+    return user
