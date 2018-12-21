@@ -12,6 +12,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 loginManager = LoginManager(app)
 
+#pylint: disable=wrong-import-position
 from lms.utils import blank_resp, init_user, init_student, get_response
 from lms.forms import RegForm, PreliminaryRegForm, PreliminaryStudentRegForm, \
     LoginForm, CourseForm, PersonalInfoForm, GroupForm, ScheduleForm
@@ -19,7 +20,7 @@ from lms.Domain.Users import User
 from lms.Domain.Courses import Course, Schedule
 from lms.Domain.Students import Student, Group
 from lms.Domain.Teachers import Teacher
-
+#pylint: enable=wrong-import-position
 
 def add_course_in(form):
     course = Course(name=form.name.data, description=form.description.data)
@@ -75,16 +76,17 @@ def preliminary_register_user():
         else:
             raise Exception(str(form.errors.items()))
 
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
 
 @app.route('/register', methods=['POST'])
 def register_user():
-    """Пользователь может зарегистрироваться в системе по коду регистрации, полученного от администратора.
+    """Пользователь может зарегистрироваться в системе
+    по коду регистрации, полученного от администратора.
 
     """
     answer = blank_resp()
@@ -102,9 +104,9 @@ def register_user():
             db.session.commit()
         else:
             raise Exception(str(form.errors.items()))
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -128,9 +130,9 @@ def login():
         else:
             raise Exception(str(form.errors.items()))
 
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -140,9 +142,9 @@ def logout():
     answer = blank_resp()
     try:
         logout_user()
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -151,7 +153,8 @@ def logout():
 @login_required
 def user(username):
     """Пользователь может просмотреть (GET) и отредактировать (POST) свой профиль.
-    Помимо своего личного профиля, пользователь также может просматривать профили других пользователей системы.
+    Помимо своего личного профиля, пользователь также может
+    просматривать профили других пользователей системы.
     Однако, основу обучения видеть другие пользователи не могут.
 
     """
@@ -174,9 +177,9 @@ def user(username):
                 answer['data'] = str(user)
             else:
                 raise Exception(str(form.errors.items()))
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -192,9 +195,9 @@ def validation_code(id):
         if request.method == 'GET':
             user = User.query.filter_by(id=id).first_or_404()
             answer['data'] = user.get_registration_uid()
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -215,9 +218,9 @@ def create_course():
             add_course_in(form)
         else:
             raise Exception(str(form.errors.items()))
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -239,9 +242,9 @@ def create_group():
             add_group_in(form)
         else:
             raise Exception(str(form.errors.items()))
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -265,9 +268,9 @@ def get_all():
             answer['data'] = str(Group.query.all())
         else:
             raise Exception('Invalid type')
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -290,9 +293,9 @@ def get_my_classmates():
         group_id = student.get_group_id()
         students = Student.query.filter_by(group_id=group_id).all()
         answer['data'] = str(students)
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -318,9 +321,9 @@ def add_group_to_course():
             db.session.commit()
         else:
             raise Exception(str(form.errors.items()))
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
@@ -343,9 +346,9 @@ def get_my_courses():
         group_id = student.get_group_id()
         my_schedule = Schedule.query.filter_by(group_id=group_id).all()
         answer['data'] = str(my_schedule)
-    except Exception as e:
+    except Exception as exception:
         answer['status'] = 'error'
-        answer['error_message'] = str(e)
+        answer['error_message'] = str(exception)
 
     return get_response(answer)
 
