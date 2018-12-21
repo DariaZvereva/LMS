@@ -3,7 +3,7 @@ from lms.app import db
 
 class Course(db.Model):
     __tablename__ = "courses"
-    __table_args__ = {"useexisting": True}
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, index=True)
     description = db.Column(db.String(64))
@@ -13,4 +13,3 @@ class Course(db.Model):
 
     def get_id(self):
         return self.id
-

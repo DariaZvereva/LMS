@@ -5,7 +5,7 @@ from lms.Domain.Courses import Course
 
 class Schedule(db.Model):
     __tablename__ = "schedule"
-    __table_args__ = {"useexisting": True}
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))

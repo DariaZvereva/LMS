@@ -4,7 +4,7 @@ from lms.Domain.Students import Group
 
 class Student(db.Model):
     __tablename__ = "students"
-    __table_args__ = {"useexisting": True}
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
