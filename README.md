@@ -50,6 +50,13 @@ flask run
 ```
 (для windows `set FLASK_APP=app.py`)
 
+## Запуск тестов
+
+```
+chmod +x setup.py
+./setup.py test
+```
+
 ## Copyright
 
 Copyright © 2018 Daria Zvereva, Bobrovskaya Nataliya. See [license] for details.
