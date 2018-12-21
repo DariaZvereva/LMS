@@ -1,4 +1,5 @@
 from lms.app import db
+from lms.Domain.Students import Group
 
 
 class Student(db.Model):
@@ -13,7 +14,16 @@ class Student(db.Model):
     education_basis = db.Column(db.String(64))
 
     def __repr__(self):
-        return  'Учебная группа: {group}, Год поступления: {year}, Степень: {degree}, ' \
+        return  'User_id: {user_id}, Учебная группа: {group}, Год поступления: {year}, Степень: {degree}, ' \
                'Форма обучения: {education}, Основа обучения: {basis} |'.format(
-            group=self.group_id, year=self.year, degree=self.degree, education=self.education_form,
-            basis=self.education_basis)
+            group=self.get_group(), year=self.year, degree=self.degree, education=self.education_form,
+            basis=self.education_basis, user_id=self.user_id)
+
+    def get_group(self):
+        return Group.query.filter_by(id=self.group_id).first()
+
+    def get_group_id(self):
+        return self.group_id
+
+    def get_id(self):
+        return self.id

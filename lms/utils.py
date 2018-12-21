@@ -30,10 +30,10 @@ def init_user(form):
         registration_uid=generate_validation_code()
     )
 
-def init_student(form, user_id):
+def init_student(form, user_id, group_id):
     return Student(
         user_id=user_id,
-        group_id=form.group_id.data,
+        group_id=group_id,
         year=form.year.data,
         degree=form.degree.data,
         education_form=form.education_form.data,
