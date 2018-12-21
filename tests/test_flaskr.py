@@ -24,6 +24,7 @@ class appDBTests(unittest.TestCase):
         """
         Creates a new database for the unit test to use
         """
+        db.init(app)
         with app.app_context():
             db.create_all()
             user = User(
