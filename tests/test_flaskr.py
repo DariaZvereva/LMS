@@ -8,6 +8,7 @@ from lms.Domain.Users import User
 from lms.Domain.Courses import Course
 from lms.Domain.Students import Student, Group
 from lms.Domain.Teachers import Teacher
+from flask_login import current_user
 
 db = SQLAlchemy(app)
 
@@ -32,7 +33,7 @@ class appDBTests(unittest.TestCase):
             db.drop_all()
 
     def test_create_course(self):
-        """Ensure a new user can be added to the database."""
+        """Ensure a new course can not be added to the database without login."""
         with app.test_client() as client:
             response = client.post(
                 '/create_course',
