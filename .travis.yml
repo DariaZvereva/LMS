@@ -4,9 +4,9 @@ python:
 before_install:
   - chmod +x setup.py
 install:
+  - pip install flask
   - pip install -r requirements.txt
-env:
-  - FLASK=1.0.2
+  - pip install codecov
 script:
   - ./setup.py test
 after_success:
